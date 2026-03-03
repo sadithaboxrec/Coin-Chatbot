@@ -12,33 +12,34 @@ import java.util.Map;
 @Service
 public class ChatBotServiceImpl implements ChatBotService {
 
-    private double doubleConverter(Object value) {
-
-        if (value instanceof Integer) {
-            return ((Integer) value).doubleValue();
-        }else if (value instanceof Long) {
-            return ((Long) value).doubleValue();
-        }else if (value instanceof Double) {
-            return (Double)value;
-        }
-        else throw new  IllegalArgumentException("unsupported data "+value.getClass().getName());
-
-
-
-//        private double doubleConverter(Object value) {
-//            if (value == null) return 0.0;
+//    private double doubleConverter(Object value) {
 //
-//            if (value instanceof Number) {
-//                return ((Number) value).doubleValue();
-//            }
-//
-//            throw new IllegalArgumentException("Unsupported type: " + value.getClass().getName());
+//        if (value instanceof Integer) {
+//            return ((Integer) value).doubleValue();
+//        }else if (value instanceof Long) {
+//            return ((Long) value).doubleValue();
+//        }else if (value instanceof Double) {
+//            return (Double)value;
 //        }
-    }
+//        else throw new  IllegalArgumentException("unsupported data "+value.getClass().getName());
+//
+//
+//
+        private double doubleConverter(Object value) {
+            if (value == null) return 0.0;
+
+            if (value instanceof Number) {
+                return ((Number) value).doubleValue();
+            }
+
+            throw new IllegalArgumentException("Unsupported type: " + value.getClass().getName());
+        }
+//    }
+
 
     public CoinDTO makeApiRequest(String currencyName) throws Exception {
 
-        String url = "https://api.coingecko.com/api/v3/coins/" + currencyName;
+        String url = "https://api.coingecko.com/api/v3/coins/bitcoin";
 
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
@@ -55,21 +56,21 @@ public class ChatBotServiceImpl implements ChatBotService {
             coinDTO.setId((String)responseBody.get("id"));
             coinDTO.setCoinName((String)responseBody.get("name"));
             coinDTO.setSymbol((String)responseBody.get("symbol"));
-            coinDTO.setImage((String)responseBody.get("large"));
+            coinDTO.setImage((String)image.get("large"));
 
          //   marketData
             coinDTO.setCurrentPrice(doubleConverter(((Map<String,Object>)marketData.get("current_price")).get("usd")));
             coinDTO.setMarketCap(doubleConverter(((Map<String,Object>)marketData.get("market_cap")).get("usd")));
-            coinDTO.setMarketCapRank(doubleConverter(((Map<String,Object>)marketData.get("market_cap_rank"))));
+            coinDTO.setMarketCapRank(doubleConverter((marketData.get("market_cap_rank"))));
             coinDTO.setTotalVolume(doubleConverter(((Map<String,Object>)marketData.get("total_volume")).get("usd")));
-            coinDTO.setHigh24h(doubleConverter(((Map<String,Object>)marketData.get("high_24")).get("usd")));
-            coinDTO.setLow24h(doubleConverter(((Map<String,Object>)marketData.get("low_24")).get("usd")));
-            coinDTO.setPriceChange24h(doubleConverter(((Map<String,Object>)marketData.get("price_change_24"))));
-            coinDTO.setPriceChangePercentage24h(doubleConverter(((Map<String,Object>)marketData.get("price_change_percentage_24"))));
-            coinDTO.setMarketCapChange24h(doubleConverter(((Map<String,Object>)marketData.get("market_cap_change_24"))));
-            coinDTO.setMarketCapChangePercentage24h(doubleConverter(((Map<String,Object>)marketData.get("market_cap_change_percentage_24"))));
-            coinDTO.setCirculatingSupply(doubleConverter(((Map<String,Object>)marketData.get("circulating_supply"))));
-            coinDTO.setTotalSupply(doubleConverter(((Map<String,Object>)marketData.get("total_supply"))));
+            coinDTO.setHigh24h(doubleConverter(((Map<String,Object>)marketData.get("high_24h")).get("usd")));
+            coinDTO.setLow24h(doubleConverter(((Map<String,Object>)marketData.get("low_24h")).get("usd")));
+            coinDTO.setPriceChange24h(doubleConverter((marketData.get("price_change_24"))));
+            coinDTO.setPriceChangePercentage24h(doubleConverter((marketData.get("price_change_percentage_24h"))));
+            coinDTO.setMarketCapChange24h(doubleConverter((marketData.get("market_cap_change_24h"))));
+            coinDTO.setMarketCapChangePercentage24h(doubleConverter((marketData.get("market_cap_change_percentage_24h"))));
+            coinDTO.setCirculatingSupply(doubleConverter((marketData.get("circulating_supply"))));
+            coinDTO.setTotalSupply(doubleConverter((marketData.get("total_supply"))));
 
             return coinDTO;
         }
@@ -82,12 +83,16 @@ public class ChatBotServiceImpl implements ChatBotService {
     }
 
     @Override
-    public String sendChat(String prompt) {
+    public String sendChat(String prompt)   {
         return "";
     }
 
     @Override
-    public ApiResponse getCoinDetails(String prompt) {
+    public ApiResponse getCoinDetails(String prompt) throws Exception {
+
+        CoinDTO coinDTO = makeApiRequest(prompt);
+        System.out.println("coin dto: "+coinDTO);
+
         return null;
     }
 }
